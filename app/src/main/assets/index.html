@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0b5cff">
+<title>ANSAMA · Comparador de Energía</title>
+<style>
+:root{--blue:#0b5cff;--bg:#f4f7fb;--card:#fff;--text:#152033;--muted:#64748b;--line:#dbe3ef;--good:#138a4b;--warn:#fff4d6}
+*{box-sizing:border-box} body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--text)}
+header{background:linear-gradient(135deg,#0b5cff,#1746b5);color:#fff;padding:24px 18px 20px}
+header h1{margin:0;font-size:25px} header p{margin:5px 0 0;opacity:.9}
+main{max-width:1000px;margin:auto;padding:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;margin-bottom:16px;box-shadow:0 5px 18px #1a2b4a0b}
+h2{font-size:18px;margin:0 0 14px}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+label{display:block;font-size:13px;color:var(--muted);margin-bottom:5px}input{width:100%;padding:11px 10px;border:1px solid var(--line);border-radius:10px;font-size:16px;background:#fff}
+.tablewrap{overflow-x:auto}.tariff{min-width:760px}.row{display:grid;grid-template-columns:180px repeat(6,1fr);gap:8px;align-items:center;margin-bottom:8px}.row.header{font-weight:700;color:var(--muted);font-size:12px}.section{font-weight:800;margin:14px 0 8px;color:#334155}
+.company{border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px}.company h3{margin:0 0 10px}.companygrid{display:grid;grid-template-columns:1.4fr repeat(6,1fr);gap:8px}
+button{border:0;border-radius:12px;padding:12px 16px;font-weight:750;font-size:15px;cursor:pointer}.primary{background:var(--blue);color:#fff}.secondary{background:#e9eef7;color:#17305e}.danger{background:#fee2e2;color:#991b1b}
+.actions{display:flex;gap:10px;flex-wrap:wrap}.result{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
+.resultbox{border:1px solid var(--line);border-radius:16px;padding:16px;background:#fff}.resultbox.best{border:2px solid var(--good);background:#f0fbf5}.name{font-weight:800}.total{font-size:27px;font-weight:900;margin:8px 0}.saving{color:var(--good);font-weight:750}
+small{color:var(--muted)}.notice{background:var(--warn);padding:11px;border-radius:10px;font-size:13px;margin-top:10px}
+@media(max-width:700px){.grid{grid-template-columns:1fr 1fr}.companygrid{grid-template-columns:1.3fr repeat(3,1fr)}.row{grid-template-columns:120px repeat(3,1fr)}}
+</style>
+</head>
+<body>
+<header><h1>⚡ ANSAMA</h1><p>Comparador de tarifas eléctricas</p></header>
+<nav style="max-width:1000px;margin:auto;padding:10px 16px;display:flex;gap:8px;flex-wrap:wrap">
+<button class="secondary" onclick="showSection('compare')">🧾 Comparativa</button>
+<button class="secondary" onclick="showSection('companies')">⚡ Comercializadoras</button>
+<button class="secondary" onclick="showSection('config')">⚙️ Configuración</button>
+<button class="secondary" onclick="showSection('history')">📁 Historial</button>
+</nav>
+<main>
+<div id="compareSection">
+<section class="card">
+<h2>1. Datos de la factura</h2>
+<div class="grid">
+<div><label>Días de facturación</label><input id="days" type="number" step="1" value="34"></div>
+<div><label>Potencia contratada (kW)</label><input id="power" type="number" step="0.01" value="4.6"></div>
+<div><label>Consumo P1 · Punta (kWh)</label><input id="c1" type="number" step="0.01" value="87"></div>
+<div><label>Consumo P2 · Llano (kWh)</label><input id="c2" type="number" step="0.01" value="153"></div>
+<div><label>Consumo P3 · Valle (kWh)</label><input id="c3" type="number" step="0.01" value="142"></div>
+<div><label>Consumo P4 (kWh)</label><input id="c4" type="number" step="0.01" value="0"></div>
+<div><label>Consumo P5 (kWh)</label><input id="c5" type="number" step="0.01" value="0"></div>
+<div><label>Consumo P6 (kWh)</label><input id="c6" type="number" step="0.01" value="0"></div>
+</div>
+</section>
+
+<section class="card">
+<h2>2. Datos de la factura</h2>
+<div class="actions">
+<button class="secondary" onclick="newComparison()">🆕 NUEVA COMPARATIVA</button>
+</div>
+<small>Los datos de esta factura son independientes de las tarifas guardadas.</small>
+</section>
+</div>
+
+<div id="companiesSection">
+<section class="card">
+<h2>Comercializadoras guardadas</h2>
+<div class="grid">
+<div><label>Impuesto eléctrico (%)</label><input id="elecTax" type="number" step="0.000001" value="5.1127"></div>
+<div><label>Bono social (€/día)</label><input id="social" type="number" step="0.000001" value="0.019121225"></div>
+<div><label>Alquiler equipos (€/día)</label><input id="rent" type="number" step="0.000001" value="0.02663"></div>
+<div><label>Otros (€)</label><input id="other" type="number" step="0.01" value="0"></div>
+<div><label>IVA (%)</label><input id="vat" type="number" step="0.01" value="21"></div>
+</div>
+<div class="notice">Los valores de impuestos se pueden modificar desde la propia aplicación.</div>
+</section>
+
+<div class="actions" style="margin-bottom:12px">
+<button class="danger" onclick="resetCompanies()">🗑️ NUEVAS COMERCIALIZADORAS</button>
+</div>
+<div id="companies"><p><small>Los precios de las comercializadoras se guardan aparte y no cambian al introducir nuevas facturas.</small></p></div>
+<div class="actions">
+<button class="secondary" onclick="addCompany()">+ Añadir comercializadora</button>
+<button class="primary" onclick="calculate()">CALCULAR COMPARATIVA</button>
+</div>
+</section>
+
+</section>
+</div>
+
+<div id="configSection" style="display:none">
+<section class="card">
+<h2>⚙️ Configuración permanente</h2>
+<p><small>Estos valores se guardan y se aplican automáticamente a todas las comparativas.</small></p>
+<div class="grid">
+<div><label>Impuesto eléctrico (%)</label><input id="elecTax" type="number" step="0.000001" value="5.1127"></div>
+<div><label>Bono social (€/día)</label><input id="social" type="number" step="0.000001" value="0.019121225"></div>
+<div><label>Alquiler equipos (€/día)</label><input id="rent" type="number" step="0.000001" value="0.02663"></div>
+<div><label>Otros (€)</label><input id="other" type="number" step="0.01" value="0"></div>
+<div><label>IVA (%)</label><input id="vat" type="number" step="0.01" value="21"></div>
+</div>
+<button class="primary" onclick="saveConfig()">GUARDAR CONFIGURACIÓN</button>
+</section>
+</div>
+
+<div id="historySection" style="display:none">
+<section class="card">
+<h2>📁 Historial de comparativas</h2>
+<div class="actions">
+<button class="danger" onclick="clearHistory()">🗑️ BORRAR HISTORIAL</button>
+</div>
+<div id="history"></div>
+</section>
+</div>
+
+<section class="card">
+<h2>4. Resultado</h2>
+<div id="results"><small>Introduce los datos y pulsa «CALCULAR COMPARATIVA».</small></div>
+<div class="actions" style="margin-top:12px">
+<button class="secondary" onclick="saveHistory()">💾 GUARDAR COMPARATIVA</button>
+</div>
+</section>
+</main>
+<script>
+const defaults=[
+{name:"Visalia - Luz Fijo 24H", power:[.054891,.054891,0,0,0,0], energy:[.1041,.1041,.1041,0,0,0]},
+{name:"Niba", power:[.073739,.001913,0,0,0,0], energy:[.189741,.120835,.089215,0,0,0]},
+{name:"Comercializadora 3",power:[0,0,0,0,0,0],energy:[0,0,0,0,0,0]},
+{name:"Comercializadora 4",power:[0,0,0,0,0,0],energy:[0,0,0,0,0,0]},
+{name:"Comercializadora 5",power:[0,0,0,0,0,0],energy:[0,0,0,0,0,0]}
+];
+let companies=JSON.parse(localStorage.getItem("ansamaCompanies")||"null")||defaults;
+function num(id){return parseFloat(document.getElementById(id).value)||0}
+function addCompany(){companies.push({name:"Nueva comercializadora",power:[0,0,0,0,0,0],energy:[0,0,0,0,0,0]});renderCompanies()}
+function save(){localStorage.setItem("ansamaCompanies",JSON.stringify(companies))}
+function renderCompanies(){
+const el=document.getElementById("companies"); el.innerHTML="";
+companies.forEach((co,i)=>{
+let d=document.createElement("div");d.className="company";
+let html=`<h3><input value="${co.name}" aria-label="Nombre" oninput="companies[${i}].name=this.value;save()"></h3>
+<div class="section">Precio potencia · €/kW/día</div><div class="companygrid">`;
+co.power.forEach((v,j)=>html+=`<div><label>P${j+1}</label><input type="number" step="0.000001" value="${v}" oninput="companies[${i}].power[${j}]=parseFloat(this.value)||0;save()"></div>`);
+html+=`</div><div class="section">Precio energía · €/kWh</div><div class="companygrid">`;
+co.energy.forEach((v,j)=>html+=`<div><label>P${j+1}</label><input type="number" step="0.000001" value="${v}" oninput="companies[${i}].energy[${j}]=parseFloat(this.value)||0;save()"></div>`);
+html+=`</div><button class="danger" style="margin-top:10px" onclick="companies.splice(${i},1);save();renderCompanies()">Eliminar</button>`;
+d.innerHTML=html;el.appendChild(d);
+})}
+function calculate(){
+const days=num("days"), power=num("power"), cons=[1,2,3,4,5,6].map(i=>num("c"+i));
+const tax=num("elecTax")/100, social=num("social"), rent=num("rent"), other=num("other"), vat=num("vat")/100;
+let out=companies.map(co=>{
+let powerCost=co.power.reduce((s,p)=>s+days*power*p,0);
+let energyCost=co.energy.reduce((s,p,j)=>s+cons[j]*p,0);
+let base=powerCost+energyCost;
+let taxCost=base*tax;
+let fixed=(base>0?days*social:0)+(base>0?days*rent:0)+(base>0?other:0);
+let subtotal=base+taxCost+fixed;
+let iva=subtotal*vat,total=subtotal+iva;
+return {name:co.name||"Sin nombre",powerCost,energyCost,taxCost,fixed,subtotal,iva,total};
+}).filter(x=>x.total>0);
+out.sort((a,b)=>a.total-b.total);
+if(!out.length){document.getElementById("results").innerHTML="<small>No hay tarifas con precios introducidos.</small>";return}
+let best=out[0].total;
+document.getElementById("results").innerHTML=`<div class="result">${out.map((r,i)=>`
+<div class="resultbox ${i===0?'best':''}">
+<div class="name">${i===0?'🏆 ':''}${r.name}</div>
+<div class="total">${r.total.toFixed(2)} €</div>
+<div class="saving">${i===0?'Tarifa más barata':'+'+(r.total-best).toFixed(2)+' € frente a la más barata'}</div>
+<details><summary>Ver desglose</summary><small>
+Potencia: ${r.powerCost.toFixed(2)} €<br>
+Energía: ${r.energyCost.toFixed(2)} €<br>
+Impuesto eléctrico: ${r.taxCost.toFixed(2)} €<br>
+Fijos/otros: ${r.fixed.toFixed(2)} €<br>
+IVA: ${r.iva.toFixed(2)} €
+</small></details></div>`).join("")}</div>`;
+}
+renderCompanies(); loadConfig(); calculate();
+
+function showSection(which){
+  document.getElementById('compareSection').style.display=which==='compare'?'block':'none';
+  document.getElementById('companiesSection').style.display=which==='companies'?'block':'none';
+  document.getElementById('configSection').style.display=which==='config'?'block':'none';
+  document.getElementById('historySection').style.display=which==='history'?'block':'none';
+  if(which==='history') renderHistory();
+}
+function newComparison(){
+  ['days','power','c1','c2','c3','c4','c5','c6'].forEach((id,i)=>{
+    document.getElementById(id).value = i===0 ? 0 : 0;
+  });
+  document.getElementById('results').innerHTML='<small>Nueva comparativa lista. Introduce los datos de la nueva factura.</small>';
+}
+function resetCompanies(){
+  if(!confirm('Se borrarán TODAS las comercializadoras y sus precios guardados. Los impuestos y el historial no se borrarán. ¿Continuar?')) return;
+  companies=[];
+  save(); renderCompanies();
+}
+function saveConfig(){
+  const cfg={elecTax:num('elecTax'),social:num('social'),rent:num('rent'),other:num('other'),vat:num('vat')};
+  localStorage.setItem('ansamaConfig',JSON.stringify(cfg));
+  alert('Configuración guardada.');
+}
+function loadConfig(){
+  const cfg=JSON.parse(localStorage.getItem('ansamaConfig')||'null');
+  if(!cfg)return;
+  for(const k of Object.keys(cfg)) if(document.getElementById(k)) document.getElementById(k).value=cfg[k];
+}
+function saveHistory(){
+  const txt=document.getElementById('results').innerText.trim();
+  if(!txt || txt.includes('Introduce los datos')) return;
+  const history=JSON.parse(localStorage.getItem('ansamaHistory')||'[]');
+  history.unshift({date:new Date().toLocaleString('es-ES'),data:{
+    days:num('days'),power:num('power'),
+    consumption:[1,2,3,4,5,6].map(i=>num('c'+i)),
+    result:txt
+  }});
+  localStorage.setItem('ansamaHistory',JSON.stringify(history));
+  alert('Comparativa guardada en el historial.');
+}
+function renderHistory(){
+  const h=JSON.parse(localStorage.getItem('ansamaHistory')||'[]');
+  document.getElementById('history').innerHTML=h.length?h.map((x,i)=>
+    `<div class="company"><b>${x.date}</b><br><small>Días: ${x.data.days} · Potencia: ${x.data.power} kW<br>${x.data.result.replace(/</g,'&lt;')}</small></div>`
+  ).join(''):'<small>No hay comparativas guardadas.</small>';
+}
+function clearHistory(){
+  if(confirm('¿Borrar todo el historial?')){localStorage.removeItem('ansamaHistory');renderHistory();}
+}
+</script>
+</body></html>
